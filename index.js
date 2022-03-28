@@ -9,6 +9,7 @@ const package = (project_name) => `{
 // most @actions toolkit packages have async methods
 function run() {
   try {
+    console.log(process.env)
     if (! fs.existsSync('.dbx')) {
       fs.mkdirSync('.dbx')
     }
