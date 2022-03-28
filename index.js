@@ -9,6 +9,8 @@ const package = (project_name) => `{
 // most @actions toolkit packages have async methods
 function run() {
   try {
+    console.log(fs.readFileSync('/home/runner/work/_temp/_github_workflow/event.json'))
+    console.log('------------------------')
     console.log(process.env)
     if (! fs.existsSync('.dbx')) {
       fs.mkdirSync('.dbx')
