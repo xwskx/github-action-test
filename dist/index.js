@@ -1680,21 +1680,25 @@ const core = __nccwpck_require__(186);
 const fs = __nccwpck_require__(747)
 
 const lock = '{}'
-const package = (project_name) => `{
-  'name': '${project_name}'
+const project = (project_name) => `{
+  "environments": {
+    "default": {
+      "profile": "DEFAULT",
+      "workspace_dir": "/Shared/dbx/${project_name}",
+      "artifact_location": "dbfs:/Shared/dbx/projects/${project_name}"
+    }
+  }
 }`
 
-// most @actions toolkit packages have async methods
 function run() {
   try {
     const events = JSON.parse(fs.readFileSync(process.env['GITHUB_EVENT_PATH'],'utf8'))
-    console.log(events)
-    console.log(events['repository']['name'])
+    const repoName = events['repository']['name']
     if (! fs.existsSync('.dbx')) {
       fs.mkdirSync('.dbx')
     }
     fs.writeFileSync('.dbx/lock.json', lock)
-    fs.writeFileSync('.dbx/package.json', package('hello-world-123'))
+    fs.writeFileSync('.dbx/project.json', project(repoName))
   } catch (error) {
     core.setFailed(error.message);
   }
