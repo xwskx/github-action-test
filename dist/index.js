@@ -1555,23 +1555,6 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 258:
-/***/ ((module) => {
-
-let wait = function (milliseconds) {
-  return new Promise((resolve) => {
-    if (typeof milliseconds !== 'number') {
-      throw new Error('milliseconds not a number');
-    }
-    setTimeout(() => resolve("done!"), milliseconds)
-  });
-};
-
-module.exports = wait;
-
-
-/***/ }),
-
 /***/ 357:
 /***/ ((module) => {
 
@@ -1694,20 +1677,21 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(186);
-const wait = __nccwpck_require__(258);
+const fs = __nccwpck_require__(747)
 
+const lock = '{}'
+const package = (project_name) => `{
+  'name': '${project_name}'
+}`
 
 // most @actions toolkit packages have async methods
-async function run() {
+function run() {
   try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
-
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
-
-    core.setOutput('time', new Date().toTimeString());
+    if (! fs.existsSync('.dbx')) {
+      fs.mkdirSync('.dbx')
+    }
+    fs.writeFileSync('.dbx/lock.json', lock)
+    fs.writeFileSync('.dbx/package.json', package('hello-world-123'))
   } catch (error) {
     core.setFailed(error.message);
   }
