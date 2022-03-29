@@ -1,0 +1,26 @@
+{
+    "default": {
+      "jobs": [
+        {
+          "libraries": [
+            {
+              "pypi": {
+                "package": "boto3==1.11.9"
+              },
+              "maven": {
+                "library": ""
+              }
+            }
+          ],
+          "spark_python_task": {
+            "python_file": "load-commodities-bronze.py"
+          },
+          "schedule": {
+            "quartz_cron_expression": "18 15 9 * * ?",
+            "timezone_id": "UTC",
+            "pause_status": "UNPAUSED"
+          }
+        }
+      ]
+    }
+  }

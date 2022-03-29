@@ -1,8 +1,15 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
-outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+name: 'DBX File Generator'
+description: 'Generates the necessary files and sets the default values for databricks jobs'
+inputs:
+ repo_name:
+    description: 'name of the git repo'
+    required: true
+ aws_id:
+    description: 'aws access key id'
+    required: true
+ aws_secret:
+    description: 'aws access key secret'
+    required: true
 runs:
   using: 'node16'
   main: 'dist/index.js'
