@@ -4,7 +4,7 @@ const path = require('path');
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {
-  process.env['INPUT_PROJECT_NAME'] = 'test-project-name';
+  process.env['INPUT_REPO_NAME'] = 'test-project-name';
   process.env['INPUT_AWS_ID'] = 'AWS_ID';
   process.env['INPUT_AWS_SECRET'] = 'AWS_SECRET';
   process.env['INPUT_DEPLOYMENT_FILE'] = 'deployment-test.json'

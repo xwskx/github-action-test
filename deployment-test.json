@@ -13,7 +13,7 @@
             }
           ],
           "spark_python_task": {
-            "python_file": "load-commodities-bronze.py"
+            "python_file": "notebook.py"
           },
           "schedule": {
             "quartz_cron_expression": "18 15 9 * * ?",
