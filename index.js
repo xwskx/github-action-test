@@ -64,9 +64,10 @@ function prune(node) {
 
 function run() {
   try {
-    const repo_name = core.getInput('repo_name')
-    const aws_id = core.getInput('aws_id')
-    const aws_secret = core.getInput('aws_secret')
+    let inputOpt = { required: true, trimWhitespace: true }
+    const repo_name = core.getInput('repo_name', inputOpt)
+    const aws_id = core.getInput('aws_id', inputOpt)
+    const aws_secret = core.getInput('aws_secret', inputOpt)
     const deployment_file = core.getInput('deployment_file') ? core.getInput('deployment_file') : 'conf/deployment.json'
     if (!fs.existsSync('.dbx')) {
       core.info('.dbx directory created')
@@ -117,5 +118,4 @@ function run() {
     core.setFailed(error.message);
   }
 }
-
 run();
