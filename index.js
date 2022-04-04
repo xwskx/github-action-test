@@ -1,5 +1,5 @@
-const core = require('@actions/core');
 const fs = require('fs');
+const core = require('@actions/core');
 
 const lock = '{}'
 const project = (repo_name) => `{
@@ -12,7 +12,7 @@ const project = (repo_name) => `{
   }
 }`
 
-const default_new_cluster = (aws_id, aws_secret, pypi_account, pypi_token) => `{
+const default_new_cluster = (repo_name, aws_id, aws_secret, pypi_account, pypi_token) => `{
   "spark_version": "9.1.x-scala2.12",
   "node_type_id": "i3.xlarge",
   "spark_conf": {
@@ -25,6 +25,7 @@ const default_new_cluster = (aws_id, aws_secret, pypi_account, pypi_token) => `{
     "fs.s3a.secret.key": "${aws_secret}"
   },
   "spark_env_vars": {
+    "JOB_NAME": "${repo_name}",
     "PYPI_ACCOUNT": "${pypi_account}",
     "PYPI_TOKEN": "${pypi_token}"
   },
@@ -37,13 +38,13 @@ const default_new_cluster = (aws_id, aws_secret, pypi_account, pypi_token) => `{
   ],
   "aws_attributes": {
     "first_on_demand": 1,
-    "availability": "SPOT",
+    "availability": "SPOT_WITH_FALLBACK",
     "zone_id": "us-west-2d",
     "spot_bid_price_percent": 100,
     "ebs_volume_count": 0
   },
   "autoscale": {
-    "min_workers": 2,
+    "min_workers": 1,
     "max_workers": 8
   }
 }`
@@ -107,7 +108,7 @@ function run() {
       }
       // set default cluster setting if not defined
       if (!job['new_cluster'] && !job['existing_cluster_id']) {
-        job['new_cluster'] = JSON.parse(default_new_cluster(aws_id, aws_secret, pypi_account, pypi_token))
+        job['new_cluster'] = JSON.parse(default_new_cluster(repo_name, aws_id, aws_secret, pypi_account, pypi_token))
         core.info(`using default new cluster configuration`)
       }
       // set max current runs to 1 if not defined
