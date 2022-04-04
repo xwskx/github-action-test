@@ -12,7 +12,7 @@ const project = (repo_name) => `{
   }
 }`
 
-const default_new_cluster = (repo_name, aws_id, aws_secret, pypi_account, pypi_token) => `{
+const default_new_cluster = (repo_name, pulsar_url, aws_id, aws_secret, pypi_account, pypi_token) => `{
   "spark_version": "9.1.x-scala2.12",
   "node_type_id": "i3.xlarge",
   "spark_conf": {
@@ -26,6 +26,7 @@ const default_new_cluster = (repo_name, aws_id, aws_secret, pypi_account, pypi_t
   },
   "spark_env_vars": {
     "JOB_NAME": "${repo_name}",
+    "PULSAR_URL": "${pulsar_url}",
     "PYPI_ACCOUNT": "${pypi_account}",
     "PYPI_TOKEN": "${pypi_token}"
   },
@@ -76,6 +77,7 @@ function run() {
   try {
     let inputOpt = { required: true, trimWhitespace: true }
     const repo_name = core.getInput('repo_name', inputOpt)
+    const pulsar_url = core.getInput('pulsar_url', inputOpt)
     const aws_id = core.getInput('aws_id', inputOpt)
     const aws_secret = core.getInput('aws_secret', inputOpt)
     const pypi_account = core.getInput('pypi_account', inputOpt)
@@ -108,7 +110,7 @@ function run() {
       }
       // set default cluster setting if not defined
       if (!job['new_cluster'] && !job['existing_cluster_id']) {
-        job['new_cluster'] = JSON.parse(default_new_cluster(repo_name, aws_id, aws_secret, pypi_account, pypi_token))
+        job['new_cluster'] = JSON.parse(default_new_cluster(repo_name, pulsar_url, aws_id, aws_secret, pypi_account, pypi_token))
         core.info(`using default new cluster configuration`)
       }
       // set max current runs to 1 if not defined
