@@ -1676,8 +1676,8 @@ module.exports = require("util");
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
-const core = __nccwpck_require__(186);
 const fs = __nccwpck_require__(747);
+const core = __nccwpck_require__(186);
 
 const lock = '{}'
 const project = (repo_name) => `{
@@ -1690,7 +1690,7 @@ const project = (repo_name) => `{
   }
 }`
 
-const default_new_cluster = (aws_id, aws_secret) => `{
+const default_new_cluster = (repo_name, pulsar_url, aws_id, aws_secret, pypi_account, pypi_token) => `{
   "spark_version": "9.1.x-scala2.12",
   "node_type_id": "i3.xlarge",
   "spark_conf": {
@@ -1703,16 +1703,27 @@ const default_new_cluster = (aws_id, aws_secret) => `{
     "fs.s3a.secret.key": "${aws_secret}"
   },
   "spark_env_vars": {
+    "JOB_NAME": "${repo_name}",
+    "PULSAR_URL": "${pulsar_url}",
+    "PYPI_ACCOUNT": "${pypi_account}",
+    "PYPI_TOKEN": "${pypi_token}"
   },
+  "init_scripts": [
+    {
+      "dbfs": {
+        "destination": "dbfs:/databricks/init-scripts/set-private-pip-wsk.sh"
+      }
+    }
+  ],
   "aws_attributes": {
     "first_on_demand": 1,
-    "availability": "SPOT",
+    "availability": "SPOT_WITH_FALLBACK",
     "zone_id": "us-west-2d",
     "spot_bid_price_percent": 100,
     "ebs_volume_count": 0
   },
   "autoscale": {
-    "min_workers": 2,
+    "min_workers": 1,
     "max_workers": 8
   }
 }`
@@ -1744,9 +1755,13 @@ function run() {
   try {
     let inputOpt = { required: true, trimWhitespace: true }
     const repo_name = core.getInput('repo_name', inputOpt)
+    const pulsar_url = core.getInput('pulsar_url', inputOpt)
     const aws_id = core.getInput('aws_id', inputOpt)
     const aws_secret = core.getInput('aws_secret', inputOpt)
+    const pypi_account = core.getInput('pypi_account', inputOpt)
+    const pypi_token = core.getInput('pypi_token', inputOpt)
     const deployment_file = core.getInput('deployment_file') ? core.getInput('deployment_file') : 'conf/deployment.json'
+
     if (!fs.existsSync('.dbx')) {
       core.info('.dbx directory created')
       fs.mkdirSync('.dbx')
@@ -1773,7 +1788,7 @@ function run() {
       }
       // set default cluster setting if not defined
       if (!job['new_cluster'] && !job['existing_cluster_id']) {
-        job['new_cluster'] = JSON.parse(default_new_cluster(aws_id, aws_secret))
+        job['new_cluster'] = JSON.parse(default_new_cluster(repo_name, pulsar_url, aws_id, aws_secret, pypi_account, pypi_token))
         core.info(`using default new cluster configuration`)
       }
       // set max current runs to 1 if not defined
@@ -1797,6 +1812,7 @@ function run() {
   }
 }
 run();
+
 })();
 
 module.exports = __webpack_exports__;
